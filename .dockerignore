@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+LICENSE
+
+# Logs
+log/*
+tmp/*
+
+# Database files (will be mounted as volume)
+db/*.sqlite3
+
+# Local environment files
+.env
+.env.local
+
+# Ruby/Bundler
+.bundle/
+vendor/bundle/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+coverage/
+.rspec
+
+# CI/CD
+.github/
+
+# Docker files
+docker-compose.yml
+docker-compose.override.yml
+Dockerfile
+.dockerignore

@@ -1,0 +1,18 @@
+services:
+  # Production service
+  app:
+    build: .
+    ports:
+      - "4567:4567"
+    environment:
+      - RACK_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-your-production-jwt-secret-key}
+      - PORT=4567
+    volumes:
+      - ./db:/app/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4567/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
