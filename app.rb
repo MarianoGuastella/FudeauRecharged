@@ -21,6 +21,7 @@ require_relative 'app/routes/auth_routes'
 require_relative 'app/routes/product_routes'
 require_relative 'app/routes/category_routes'
 require_relative 'app/routes/menu_routes'
+require_relative 'app/routes/product_modifier_routes'
 
 class RestaurantAPI < Sinatra::Base
   include ErrorHandlers
@@ -29,6 +30,7 @@ class RestaurantAPI < Sinatra::Base
   include ProductRoutes
   include CategoryRoutes
   include MenuRoutes
+  include ProductModifierRoutes
 
   configure do
     set :show_exceptions, false
@@ -53,6 +55,7 @@ class RestaurantAPI < Sinatra::Base
   register_product_routes
   register_category_routes
   register_menu_routes
+  register_product_modifier_routes
 
   # Health check endpoint
   get '/health' do

@@ -2,7 +2,7 @@
 
 require_relative '../spec_helper'
 
-RSpec.describe 'Simplified API Tests' do
+RSpec.describe 'Basic API Tests' do
   describe 'GET /health' do
     it 'returns health status' do
       get '/health'
