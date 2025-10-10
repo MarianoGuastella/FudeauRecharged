@@ -15,14 +15,14 @@ class User < Sequel::Model
     super
     validates_presence [:email, :password_hash, :name]
     validates_unique :email
-    validates_format(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i, :email)
+    validates_format(/\A[\w+\-.]+@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i, :email)
   end
 
   def password=(new_password)
     self.password_hash = Password.create(new_password)
   end
 
-  def authenticate(password)
+  def authenticate?(password)
     Password.new(password_hash) == password
   end
 

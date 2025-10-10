@@ -39,21 +39,21 @@ module MenuRoutes
                                 id: option.product.id,
                                 name: option.product.name,
                                 description: option.product.description,
-                                price: sprintf('%.1f', option.product.price).sub(/\.0$/, '')
+                                price: format('%.1f', option.product.price).sub(/\.0$/, ''),
                               },
-                              additional_price: sprintf('%.1f', option.additional_price).sub(/\.0$/, ''),
-                              default_selected: option.default_selected || false
+                              additional_price: format('%.1f', option.additional_price).sub(/\.0$/, ''),
+                              default_selected: option.default_selected || false,
                             }
-                          end
+                          end,
                         }
                       end
                       product_hash
-                    end
+                    end,
                   }
-                end
+                end,
               }
-            end
-          }
+            end,
+          },
         }
         menu_data.to_json
       end
@@ -61,7 +61,7 @@ module MenuRoutes
       get '/menus/categories/:id' do
         category = Category[params[:id]]
         halt 404, { error: 'Category not found' }.to_json unless category
-        
+
         menu_data = {
           id: category.id,
           name: category.name,
@@ -83,16 +83,16 @@ module MenuRoutes
                       id: option.product.id,
                       name: option.product.name,
                       description: option.product.description,
-                      price: sprintf('%.1f', option.product.price).sub(/\.0$/, '')
+                      price: format('%.1f', option.product.price).sub(/\.0$/, ''),
                     },
-                    additional_price: sprintf('%.1f', option.additional_price).sub(/\.0$/, ''),
-                    default_selected: option.default_selected || false
+                    additional_price: format('%.1f', option.additional_price).sub(/\.0$/, ''),
+                    default_selected: option.default_selected || false,
                   }
-                end
+                end,
               }
             end
             product_hash
-          end
+          end,
         }
         menu_data.to_json
       end

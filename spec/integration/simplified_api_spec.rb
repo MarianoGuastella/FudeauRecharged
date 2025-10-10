@@ -6,7 +6,7 @@ RSpec.describe 'Simplified API Tests' do
   describe 'GET /health' do
     it 'returns health status' do
       get '/health'
-      
+
       expect(last_response.status).to eq(200)
       response = json_response
       expect(response[:status]).to eq('ok')
@@ -20,7 +20,7 @@ RSpec.describe 'Simplified API Tests' do
         user_data = {
           email: "test-user-#{Time.now.to_f}@example.com",
           password: 'password123',
-          name: 'New User'
+          name: 'New User',
         }
 
         post '/auth/register', user_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
@@ -38,13 +38,13 @@ RSpec.describe 'Simplified API Tests' do
         user_data = {
           email: 'loginuser@example.com',
           password: 'password123',
-          name: 'Login User'
+          name: 'Login User',
         }
         post '/auth/register', user_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
         login_data = {
           email: user_data[:email],
-          password: user_data[:password]
+          password: user_data[:password],
         }
         post '/auth/login', login_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
@@ -57,7 +57,7 @@ RSpec.describe 'Simplified API Tests' do
       it 'returns error for invalid credentials' do
         login_data = {
           email: 'nonexistent@example.com',
-          password: 'wrongpassword'
+          password: 'wrongpassword',
         }
         post '/auth/login', login_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
@@ -84,7 +84,7 @@ RSpec.describe 'Simplified API Tests' do
         category_data = {
           name: 'Test Category',
           description: 'A test category',
-          sort_order: 1
+          sort_order: 1,
         }
 
         post '/categories', category_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
@@ -118,7 +118,7 @@ RSpec.describe 'Simplified API Tests' do
           name: 'Test Product',
           description: 'A test product',
           price: 12.99,
-          category_id: @category.id
+          category_id: @category.id,
         }
 
         post '/products', product_data.to_json, { 'CONTENT_TYPE' => 'application/json' }

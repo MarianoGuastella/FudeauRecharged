@@ -11,7 +11,7 @@ module AuthRoutes
       post '/auth/register' do
         handle_json_parse_error do
           data = JSON.parse(request.body.read, symbolize_names: true)
-          
+
           handle_authentication_errors do
             user = User.create(data)
             logger.info "New user registered - ID: #{user.id}, Email: #{user.email}"
@@ -24,10 +24,10 @@ module AuthRoutes
       post '/auth/login' do
         handle_json_parse_error do
           data = JSON.parse(request.body.read, symbolize_names: true)
-          
+
           handle_authentication_errors do
             user = User.where(email: data[:email]).first
-            if user&.authenticate(data[:password])
+            if user&.authenticate?(data[:password])
               if user.active
                 logger.info "Successful login for user ID: #{user.id}"
                 # Generate authentication token
@@ -53,8 +53,11 @@ module AuthRoutes
           user_id = decode_jwt_token(token)
           if user_id
             user = User[user_id]
-            user ? user.to_hash_with_associations.to_json : 
-                   (halt 401, { error: 'Invalid token' }.to_json)
+            if user
+              user.to_hash_with_associations.to_json
+            else
+              (halt 401, { error: 'Invalid token' }.to_json)
+            end
           else
             halt 401, { error: 'Invalid token' }.to_json
           end

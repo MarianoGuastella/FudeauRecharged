@@ -23,19 +23,19 @@ RSpec.configure do |config|
     # Clean database before each test
     # Disable foreign key checks temporarily
     DB.run('PRAGMA foreign_keys = OFF')
-    
-    tables_to_clear = %w[
-      product_modifier_options
-      product_modifiers  
-      products
-      categories
-      users
+
+    tables_to_clear = [
+      'product_modifier_options',
+      'product_modifiers',
+      'products',
+      'categories',
+      'users',
     ]
-    
+
     tables_to_clear.each do |table|
       DB[table.to_sym].delete if DB.table_exists?(table.to_sym)
     end
-    
+
     # Re-enable foreign key checks
     DB.run('PRAGMA foreign_keys = ON')
   end
@@ -54,16 +54,16 @@ RSpec.configure do |config|
     User.create(
       email: unique_email,
       password: password,
-      name: name
+      name: name,
     )
   end
 
   def login_user(user)
     post '/auth/login', {
       email: user.email,
-      password: 'password123'
+      password: 'password123',
     }.to_json, { 'CONTENT_TYPE' => 'application/json' }
-    
+
     json_response[:token]
   end
 

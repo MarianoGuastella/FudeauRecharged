@@ -65,10 +65,10 @@ docker-run:
 
 # Linting
 lint:
-	bundle exec rubocop
+	bundle exec rubocop --config .rubocop.yml
 
 lint-fix:
-	bundle exec rubocop -a
+	bundle exec rubocop --config .rubocop.yml --autocorrect-all
 
 # Development helpers
 console:

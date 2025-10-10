@@ -34,11 +34,11 @@ class RestaurantAPI < Sinatra::Base
     set :show_exceptions, false
     set :raise_errors, false
     set :logging, true
-    
+
     # Configure logger
-    logger = Logger.new(STDOUT)
+    logger = Logger.new($stdout)
     logger.level = ENV['LOG_LEVEL']&.upcase == 'DEBUG' ? Logger::DEBUG : Logger::INFO
-    logger.formatter = proc do |severity, datetime, progname, msg|
+    logger.formatter = proc do |severity, datetime, _progname, msg|
       "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity}: #{msg}\n"
     end
     set :logger, logger

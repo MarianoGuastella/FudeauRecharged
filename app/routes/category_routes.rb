@@ -11,21 +11,21 @@ module CategoryRoutes
       get '/categories' do
         page = (params[:page] || 1).to_i
         per_page = (params[:per_page] || 2).to_i
-        
+
         total = Category.count
         total_pages = (total.to_f / per_page).ceil
-        
+
         offset = (page - 1) * per_page
         categories = Category.limit(per_page).offset(offset).all
-        
-        { 
+
+        {
           data: categories.map(&:to_hash),
           pagination: {
             page: page,
             per_page: per_page,
             total: total,
-            total_pages: total_pages
-          }
+            total_pages: total_pages,
+          },
         }.to_json
       end
 
@@ -42,7 +42,7 @@ module CategoryRoutes
       post '/categories' do
         handle_json_parse_error do
           data = JSON.parse(request.body.read, symbolize_names: true)
-          
+
           handle_database_errors do
             category = Category.create(data)
             status 201
@@ -54,10 +54,10 @@ module CategoryRoutes
       put '/categories/:id' do
         category = Category[params[:id]]
         halt 404, { error: 'Category not found' }.to_json unless category
-        
+
         handle_json_parse_error do
           data = JSON.parse(request.body.read, symbolize_names: true)
-          
+
           handle_database_errors do
             category.update(data)
             category.to_hash.to_json
@@ -68,13 +68,13 @@ module CategoryRoutes
       delete '/categories/:id' do
         category = Category[params[:id]]
         halt 404, { error: 'Category not found' }.to_json unless category
-        
+
         handle_database_errors do
-          if Product.where(category_id: category.id).count > 0
+          if Product.where(category_id: category.id).any?
             status 422
             return { error: 'Cannot delete category with products' }.to_json
           end
-          
+
           category.destroy
           { message: 'Category deleted successfully' }.to_json
         end

@@ -10,7 +10,7 @@ module DatabaseConfig
     @connection ||= Sequel.connect(
       adapter: 'sqlite',
       database: database_path,
-      test: false
+      test: false,
     )
   end
 
@@ -18,16 +18,16 @@ module DatabaseConfig
     @test_connection ||= Sequel.connect(
       adapter: 'sqlite',
       database: ':memory:',
-      test: true
+      test: true,
     )
   end
 
   def self.database_path
     return ':memory:' if ENV['RACK_ENV'] == 'test'
-    
+
     db_dir = File.expand_path('../db', __dir__)
-    Dir.mkdir(db_dir) unless Dir.exist?(db_dir)
-    
+    FileUtils.mkdir_p(db_dir)
+
     File.join(db_dir, "#{ENV.fetch('RACK_ENV', 'development')}.sqlite3")
   end
 

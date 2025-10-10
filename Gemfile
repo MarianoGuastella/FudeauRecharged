@@ -9,8 +9,8 @@ gem 'sinatra', '~> 3.0'
 gem 'sinatra-contrib', '~> 3.0'
 
 # Database
-gem 'sqlite3', '~> 1.6'
 gem 'sequel', '~> 5.70'
+gem 'sqlite3', '~> 1.6'
 
 # Authentication
 gem 'bcrypt', '~> 3.1'
@@ -29,10 +29,10 @@ gem 'dotenv', '~> 2.8'
 gem 'dry-validation', '~> 1.10'
 
 group :development, :test do
-  gem 'rspec', '~> 3.12'
-  gem 'rack-test', '~> 2.1'
   gem 'factory_bot', '~> 6.2'
   gem 'faker', '~> 3.2'
+  gem 'rack-test', '~> 2.1'
+  gem 'rspec', '~> 3.12'
   gem 'rubocop', '~> 1.56'
   gem 'rubocop-rspec', '~> 2.23'
 end

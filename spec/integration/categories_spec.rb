@@ -15,7 +15,7 @@ RSpec.describe 'Categories API' do
       get '/categories', {}, auth_headers(token)
 
       expect(last_response.status).to eq(200)
-      
+
       response = json_response
       expect(response[:data]).to be_an(Array)
       expect(response[:data].length).to eq(2)
@@ -31,7 +31,7 @@ RSpec.describe 'Categories API' do
       get '/categories/tree', {}, auth_headers(token)
 
       expect(last_response.status).to eq(200)
-      
+
       response = json_response
       expect(response).to be_an(Array)
       expect(response.first[:name]).to eq('Food')
@@ -44,7 +44,7 @@ RSpec.describe 'Categories API' do
       {
         name: 'Desserts',
         description: 'Sweet treats',
-        sort_order: 3
+        sort_order: 3,
       }
     end
 
@@ -52,7 +52,7 @@ RSpec.describe 'Categories API' do
       post '/categories', category_data.to_json, headers
 
       expect(last_response.status).to eq(201)
-      
+
       response = json_response
       expect(response[:name]).to eq(category_data[:name])
       expect(response[:description]).to eq(category_data[:description])
@@ -61,7 +61,7 @@ RSpec.describe 'Categories API' do
     it 'creates a subcategory' do
       parent = Category.create(name: 'Beverages', sort_order: 1)
       subcategory_data = category_data.merge(parent_id: parent.id)
-      
+
       post '/categories', subcategory_data.to_json, headers
 
       expect(last_response.status).to eq(201)
@@ -74,7 +74,7 @@ RSpec.describe 'Categories API' do
 
     it 'updates an existing category' do
       update_data = { name: 'New Name', description: 'Updated description' }
-      
+
       put "/categories/#{category.id}", update_data.to_json, headers
 
       expect(last_response.status).to eq(200)
@@ -100,8 +100,8 @@ RSpec.describe 'Categories API' do
     end
 
     it 'prevents deletion of category with products' do
-      product = Product.create(name: 'Test Product', price: 10.0, category_id: category.id)
-      
+      Product.create(name: 'Test Product', price: 10.0, category_id: category.id)
+
       delete "/categories/#{category.id}", {}, auth_headers(token)
 
       expect(last_response.status).to eq(422)

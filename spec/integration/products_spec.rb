@@ -16,7 +16,7 @@ RSpec.describe 'Products API' do
       get '/products', {}, auth_headers(token)
 
       expect(last_response.status).to eq(200)
-      
+
       response = json_response
       expect(response[:data]).to be_an(Array)
       expect(response[:data].length).to eq(2)
@@ -25,7 +25,7 @@ RSpec.describe 'Products API' do
     it 'filters by category' do
       other_category = Category.create(name: 'Other Category', sort_order: 2)
       Product.create(name: 'Other Product', price: 20.0, category_id: other_category.id)
-      
+
       get '/products', { category_id: category.id }, auth_headers(token)
 
       expect(last_response.status).to eq(200)
@@ -50,7 +50,7 @@ RSpec.describe 'Products API' do
       get "/products/#{product.id}", {}, auth_headers(token)
 
       expect(last_response.status).to eq(200)
-      
+
       response = json_response
       expect(response[:name]).to eq('Test Product')
       expect(response[:price]).to eq('12.99')
@@ -71,7 +71,7 @@ RSpec.describe 'Products API' do
         description: 'A delicious new item',
         price: 25.99,
         category_id: category.id,
-        image_url: 'https://example.com/image.jpg'
+        image_url: 'https://example.com/image.jpg',
       }
     end
 
@@ -79,7 +79,7 @@ RSpec.describe 'Products API' do
       post '/products', product_data.to_json, headers
 
       expect(last_response.status).to eq(201)
-      
+
       response = json_response
       expect(response[:name]).to eq(product_data[:name])
       expect(response[:price]).to eq('25.99')
@@ -88,7 +88,7 @@ RSpec.describe 'Products API' do
 
     it 'validates required fields' do
       invalid_data = product_data.except(:name, :price)
-      
+
       post '/products', invalid_data.to_json, headers
 
       expect(last_response.status).to eq(422)
@@ -96,7 +96,7 @@ RSpec.describe 'Products API' do
 
     it 'validates price is positive' do
       invalid_data = product_data.merge(price: -5.0)
-      
+
       post '/products', invalid_data.to_json, headers
 
       expect(last_response.status).to eq(422)
@@ -108,7 +108,7 @@ RSpec.describe 'Products API' do
 
     it 'updates an existing product' do
       update_data = { name: 'Updated Name', price: 15.50 }
-      
+
       put "/products/#{product.id}", update_data.to_json, headers
 
       expect(last_response.status).to eq(200)
@@ -129,18 +129,18 @@ RSpec.describe 'Products API' do
 
     it 'prevents deletion of product used in modifiers' do
       modifier = ProductModifier.create(
-        name: 'Test Modifier', 
+        name: 'Test Modifier',
         product_id: product.id,
         min_selections: 0,
-        max_selections: 1
+        max_selections: 1,
       )
       other_product = Product.create(name: 'Other Product', price: 5.0, category_id: category.id)
       ProductModifierOption.create(
         product_modifier_id: modifier.id,
         product_id: other_product.id,
-        additional_price: 0.0
+        additional_price: 0.0,
       )
-      
+
       delete "/products/#{other_product.id}", {}, auth_headers(token)
 
       expect(last_response.status).to eq(422)

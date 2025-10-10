@@ -10,16 +10,16 @@ Sequel.extension :migration
 class MigrationRunner
   def self.run!
     migration_dir = File.expand_path('../db/migrations', __dir__)
-    
+
     if Dir.exist?(migration_dir)
       puts "Running migrations from: #{migration_dir}"
-      
+
       Sequel::Migrator.run(DB, migration_dir)
-      puts "Migrations completed successfully!"
+      puts 'Migrations completed successfully!'
     else
-      puts "No migrations directory found"
+      puts 'No migrations directory found'
     end
-  rescue => e
+  rescue StandardError => e
     puts "Migration failed: #{e.message}"
     puts e.backtrace.join("\n")
     raise e

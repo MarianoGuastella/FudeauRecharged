@@ -1,80 +1,187 @@
+# RuboCop configuration for Sinatra project
+# Configuración básica y limpia para aplicaciones Sinatra
+
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
+  SuggestExtensions: false
   Exclude:
     - 'vendor/**/*'
     - 'db/**/*'
     - 'tmp/**/*'
     - 'log/**/*'
-    - 'spec/spec_helper.rb'
+    - 'node_modules/**/*'
+    - '.git/**/*'
 
-require:
-  - rubocop-rspec
+# ==========================================
+# LAYOUT - Formato y presentación del código
+# ==========================================
 
-# Increase line length limit
 Layout/LineLength:
   Max: 120
+  Exclude:
+    - 'config.ru'
+    - 'db/migrations/**/*'
 
-# Allow longer methods in tests
+Layout/TrailingEmptyLines:
+  Enabled: true
+
+Layout/TrailingWhitespace:
+  Enabled: true
+
+Layout/IndentationConsistency:
+  Enabled: true
+
+Layout/IndentationWidth:
+  Width: 2
+
+Layout/SpaceAroundOperators:
+  Enabled: true
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: space
+
+# ==========================================
+# METRICS - Límites de complejidad y tamaño
+# ==========================================
+
 Metrics/MethodLength:
-  Max: 15
+  Max: 20
   Exclude:
     - 'spec/**/*'
     - 'lib/seeds.rb'
+    - 'db/migrations/**/*'
+    - 'app/routes/**/*'
 
-# Allow longer classes
 Metrics/ClassLength:
   Max: 150
   Exclude:
     - 'spec/**/*'
     - 'lib/seeds.rb'
+    - 'app.rb'
 
-# Allow longer blocks in tests and seeds
 Metrics/BlockLength:
+  Max: 25
   Exclude:
     - 'spec/**/*'
     - 'lib/seeds.rb'
     - 'config.ru'
+    - 'app/routes/**/*'
+    - 'db/migrations/**/*'
+    - 'Rakefile'
 
-# Allow longer modules
 Metrics/ModuleLength:
   Max: 150
 
-# Disable ABC size for seeds and specs
 Metrics/AbcSize:
+  Max: 20
   Exclude:
     - 'spec/**/*'
     - 'lib/seeds.rb'
+    - 'db/migrations/**/*'
+    - 'app/routes/**/*'
+    - 'app/helpers/error_handlers.rb' 
 
-# Documentation comments
-Style/Documentation:
-  Enabled: false
+Metrics/CyclomaticComplexity:
+  Max: 8
+  Exclude:
+    - 'app/routes/**/*'
 
-# Allow top-level class/module definitions
-Style/ClassAndModuleChildren:
-  Enabled: false
+Metrics/PerceivedComplexity:
+  Max: 8
+  Exclude:
+    - 'app/routes/**/*'
 
-# Prefer double quotes
+# ==========================================
+# STYLE - Estilo del código
+# ==========================================
+
 Style/StringLiterals:
   EnforcedStyle: single_quotes
 
-# Allow trailing commas
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: single_quotes
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
-# Allow empty rescue
-Lint/SuppressedException:
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+Style/Documentation:
   Enabled: false
 
-# RSpec specific
-RSpec/ExampleLength:
-  Max: 20
+Style/ClassAndModuleChildren:
+  Enabled: false
 
-RSpec/MultipleExpectations:
-  Max: 10
+Style/FormatString:
+  EnforcedStyle: format
 
-RSpec/NestedGroups:
-  Max: 4
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/WordArray:
+  EnforcedStyle: brackets
+
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+Style/RedundantBegin:
+  Enabled: true
+
+Style/GlobalStdStream:
+  Enabled: true
+
+# ==========================================
+# LINT - Prevención de errores
+# ==========================================
+
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true
+
+Lint/UnusedBlockArgument:
+  IgnoreEmptyBlocks: true
+  AllowUnusedKeywordArguments: true
+
+Lint/SuppressedException:
+  AllowComments: true
+
+Lint/IneffectiveAccessModifier:
+  Enabled: true
+
+# ==========================================
+# NAMING - Convenciones de nombres
+# ==========================================
+
+Naming/VariableName:
+  EnforcedStyle: snake_case
+
+Naming/MethodName:
+  EnforcedStyle: snake_case
+
+# ==========================================
+# BUNDLER - Gemfile
+# ==========================================
+
+Bundler/OrderedGems:
+  Enabled: true
+
+# ==========================================
+# SECURITY - Seguridad
+# ==========================================
+
+Security/Eval:
+  Enabled: true
+
+Security/JSONLoad:
+  Enabled: true

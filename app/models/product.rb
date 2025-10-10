@@ -34,19 +34,19 @@ class Product < Sequel::Model
   private
 
   def format_price(price)
-    formatted = sprintf('%.2f', price)
+    formatted = format('%.2f', price)
     formatted.sub(/\.00$/, '').sub(/\.(\d)0$/, '.\\1')
   end
 
-  def self.available
+  private_class_method def self.available
     where(available: true)
   end
 
-  def self.by_category(category_id)
+  private_class_method def self.by_category(category_id)
     where(category_id: category_id)
   end
 
-  def self.by_id(id)
+  private_class_method def self.by_id(id)
     where(id: id).first
   end
 end

@@ -11,6 +11,7 @@ Una API REST completa para gestionar el menú de un restaurante, construida con 
 - **Endpoint de menú completo** con toda la estructura incluyendo modificadores
 - **Base de datos SQLite** para persistencia
 - **Tests de integración** completos (41 tests, 100% pasando)
+- **Calidad de código** con RuboCop configurado para Sinatra
 - **Containerización con Docker**
 - **Documentación API** incluida
 
@@ -123,7 +124,29 @@ make test
 bundle exec rspec spec/integration/auth_spec.rb
 ```
 
-## 📚 API Endpoints
+## � Calidad de Código
+
+Este proyecto utiliza RuboCop para mantener la calidad y consistencia del código, configurado específicamente para proyectos Sinatra.
+
+```bash
+# Verificar estilo de código
+make lint
+
+# Corregir automáticamente problemas de estilo
+make lint-fix
+
+# Ejecutar con configuración específica
+bundle exec rubocop --config .rubocop.yml
+```
+
+**Configuración de RuboCop:**
+- Configurado para Ruby 3.0+
+- Adaptado para proyectos Sinatra (no Rails)
+- Límites ajustados para rutas de API que pueden ser más largas
+- Excluye directorios de dependencias y temporales
+- Incluye reglas de seguridad básicas
+
+## �📚 API Endpoints
 
 **Total de endpoints implementados: 16**
 

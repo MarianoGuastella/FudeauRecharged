@@ -16,11 +16,11 @@ class ProductModifier < Sequel::Model
     validates_presence [:name, :product_id]
     validates_type Integer, [:min_selections, :max_selections]
     validates_operator(:>=, 0, :min_selections)
-    
+
     # Only validate max >= min if both values are present
-    if min_selections && max_selections
-      validates_operator(:>=, min_selections, :max_selections)
-    end
+    return unless min_selections && max_selections
+
+    validates_operator(:>=, min_selections, :max_selections)
   end
 
   def to_hash_with_associations

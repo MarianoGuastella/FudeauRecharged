@@ -8,7 +8,7 @@ RSpec.describe 'Auth API' do
       {
         email: "test-user-#{Time.now.to_f}@example.com",
         password: 'password123',
-        name: 'New User'
+        name: 'New User',
       }
     end
 
@@ -16,7 +16,7 @@ RSpec.describe 'Auth API' do
       post '/auth/register', user_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
       expect(last_response.status).to eq(201)
-      
+
       response = json_response
       expect(response[:user][:email]).to eq(user_data[:email])
       expect(response[:user][:name]).to eq(user_data[:name])
@@ -25,7 +25,7 @@ RSpec.describe 'Auth API' do
 
     it 'returns error for invalid email' do
       invalid_data = user_data.merge(email: 'invalid-email')
-      
+
       post '/auth/register', invalid_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
       expect(last_response.status).to eq(422)
@@ -36,11 +36,11 @@ RSpec.describe 'Auth API' do
       first_user_data = {
         email: user_data[:email],
         password: 'password123',
-        name: 'First User'
+        name: 'First User',
       }
       post '/auth/register', first_user_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
       expect(last_response.status).to eq(201)
-      
+
       post '/auth/register', user_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
       expect(last_response.status).to eq(422)
@@ -54,11 +54,11 @@ RSpec.describe 'Auth API' do
     it 'logs in user with valid credentials' do
       post '/auth/login', {
         email: user.email,
-        password: 'password123'
+        password: 'password123',
       }.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
       expect(last_response.status).to eq(200)
-      
+
       response = json_response
       expect(response[:user][:email]).to eq(user.email)
       expect(response[:token]).not_to be_nil
@@ -68,7 +68,7 @@ RSpec.describe 'Auth API' do
     it 'returns error for invalid credentials' do
       post '/auth/login', {
         email: user.email,
-        password: 'wrongpassword'
+        password: 'wrongpassword',
       }.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
       expect(last_response.status).to eq(401)
@@ -77,10 +77,10 @@ RSpec.describe 'Auth API' do
 
     it 'returns error for inactive user' do
       user.update(active: false)
-      
+
       post '/auth/login', {
         email: user.email,
-        password: 'password123'
+        password: 'password123',
       }.to_json, { 'CONTENT_TYPE' => 'application/json' }
 
       expect(last_response.status).to eq(403)
