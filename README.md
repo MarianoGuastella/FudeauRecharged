@@ -54,7 +54,7 @@ make server
 # La aplicación estará en http://localhost:4567
 ```
 
-## �🛠️ Instalación y Configuración Detallada
+## ���️ Instalación y Configuración Detallada
 
 ### Instalación Local
 
@@ -148,7 +148,7 @@ bundle exec rubocop --config .rubocop.yml
 
 ## �📚 API Endpoints
 
-**Total de endpoints implementados: 16**
+**Total de endpoints implementados: 26**
 
 ### Autenticación (3 endpoints)
 
@@ -183,9 +183,25 @@ bundle exec rubocop --config .rubocop.yml
 - `?available=true` - Solo productos disponibles
 - `?page=1&per_page=20` - Paginación
 
-### Modificadores de Productos
+### Modificadores de Productos (10 endpoints)
 
-**Nota**: Los modificadores están incluidos en los endpoints de menú y se gestionan a través de la base de datos, pero actualmente no tienen endpoints CRUD dedicados.
+| Método | Endpoint | Descripción | Autenticación |
+|--------|----------|-------------|---------------|
+| GET | `/product-modifiers` | Listar modificadores (con filtros) | Sí |
+| GET | `/product-modifiers/:id` | Obtener modificador específico | Sí |
+| POST | `/product-modifiers` | Crear modificador | Sí |
+| PUT | `/product-modifiers/:id` | Actualizar modificador | Sí |
+| DELETE | `/product-modifiers/:id` | Eliminar modificador | Sí |
+| GET | `/product-modifiers/:id/options` | Listar opciones de modificador | Sí |
+| POST | `/product-modifiers/:id/options` | Crear opción de modificador | Sí |
+| PUT | `/product-modifiers/:id/options/:option_id` | Actualizar opción | Sí |
+| DELETE | `/product-modifiers/:id/options/:option_id` | Eliminar opción | Sí |
+
+#### Filtros para modificadores:
+- `?product_id=123` - Filtrar por producto
+- `?page=1&per_page=20` - Paginación
+
+**Nota**: Los modificadores también se incluyen automáticamente en los endpoints de menú con toda su estructura.
 
 ### Menú (2 endpoints)
 
@@ -250,12 +266,38 @@ curl -X POST http://localhost:4567/products \
 
 ### 5. Crear Modificador
 ```bash
-# Los modificadores se gestionan directamente en la base de datos
-# Ver datos de ejemplo en lib/seeds.rb
-# Se incluyen automáticamente en las consultas de menú
+curl -X POST http://localhost:4567/product-modifiers \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "name": "Toppings",
+    "description": "Elige tus ingredientes adicionales",
+    "product_id": 1,
+    "required": false,
+    "min_selections": 0,
+    "max_selections": 3
+  }'
 ```
 
-### 6. Obtener Menú Completo (incluyendo modificadores)
+### 6. Crear Opción de Modificador
+```bash
+curl -X POST http://localhost:4567/product-modifiers/1/options \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "product_id": 5,
+    "additional_price": 1.50,
+    "default_selected": false
+  }'
+```
+
+### 7. Obtener Modificadores de un Producto
+```bash
+curl -X GET "http://localhost:4567/product-modifiers?product_id=1" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### 8. Obtener Menú Completo (incluyendo modificadores)
 ```bash
 curl -X GET http://localhost:4567/menus \
   -H "Authorization: Bearer YOUR_TOKEN"
@@ -266,6 +308,108 @@ curl -X GET http://localhost:4567/menus \
 - Productos con precios
 - Modificadores de cada producto
 - Opciones de modificadores con precios adicionales
+
+## 🔧 Ejemplos Avanzados - Modificadores
+
+### Crear un Modificador Completo
+```bash
+# 1. Crear el modificador
+curl -X POST http://localhost:4567/product-modifiers \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "name": "Tamaño de Pizza",
+    "description": "Elige el tamaño de tu pizza",
+    "product_id": 10,
+    "required": true,
+    "min_selections": 1,
+    "max_selections": 1
+  }'
+
+# 2. Agregar opciones al modificador (ID del modificador: 5)
+curl -X POST http://localhost:4567/product-modifiers/5/options \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "product_id": 15,
+    "additional_price": 0.00,
+    "default_selected": true
+  }'
+
+curl -X POST http://localhost:4567/product-modifiers/5/options \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "product_id": 16,
+    "additional_price": 3.00,
+    "default_selected": false
+  }'
+```
+
+### Gestionar Modificadores Existentes
+```bash
+# Obtener todos los modificadores de un producto
+curl -X GET "http://localhost:4567/product-modifiers?product_id=10" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Obtener detalles de un modificador específico
+curl -X GET http://localhost:4567/product-modifiers/5 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Actualizar un modificador
+curl -X PUT http://localhost:4567/product-modifiers/5 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "max_selections": 2,
+    "description": "Elige hasta 2 tamaños de pizza"
+  }'
+
+# Eliminar una opción específica
+curl -X DELETE http://localhost:4567/product-modifiers/5/options/8 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### Respuestas de Ejemplo
+
+**GET /product-modifiers/5**
+```json
+{
+  "id": 5,
+  "name": "Tamaño de Pizza",
+  "description": "Elige el tamaño de tu pizza",
+  "required": true,
+  "min_selections": 1,
+  "max_selections": 1,
+  "product": {
+    "id": 10,
+    "name": "Pizza Margherita",
+    "category": "Pizza"
+  },
+  "options": [
+    {
+      "id": 15,
+      "product": {
+        "id": 20,
+        "name": "Pequeña",
+        "price": "0.00"
+      },
+      "additional_price": "0.00",
+      "default_selected": true
+    },
+    {
+      "id": 16,
+      "product": {
+        "id": 21,
+        "name": "Grande",
+        "price": "0.00"
+      },
+      "additional_price": "3.00",
+      "default_selected": false
+    }
+  ]
+}
+```
 
 ## 🗄️ Estructura de la Base de Datos
 
@@ -284,19 +428,35 @@ curl -X GET http://localhost:4567/menus \
 - Productos pueden tener múltiples modificadores
 - Modificadores pueden tener múltiples opciones
 - Las opciones de modificadores son productos existentes
-- **Modificadores se consultan a través de endpoints de menú**
+- **Modificadores se consultan a través de endpoints de menú Y endpoints CRUD dedicados**
 
 ## 🧩 Estructura del Proyecto
 
 ```
 .
 ├── app/
-│   └── models/             # Modelos de datos (User, Category, Product, ProductModifier, etc.)
+│   ├── models/             # Modelos de datos (User, Category, Product, ProductModifier, etc.)
+│   ├── helpers/            # Helpers para autenticación y manejo de errores
+│   └── routes/             # Endpoints organizados por módulos
+│       ├── auth_routes.rb              # Autenticación y autorización
+│       ├── category_routes.rb          # CRUD de categorías
+│       ├── product_routes.rb           # CRUD de productos
+│       ├── menu_routes.rb              # Consultas de menú completo
+│       ├── product_modifier_routes.rb  # Coordinador de modificadores
+│       ├── product_modifier_crud_routes.rb    # CRUD de modificadores
+│       └── product_modifier_option_routes.rb  # CRUD de opciones
 ├── config/                 # Configuraciones de base de datos
 ├── db/
 │   └── migrations/         # Migraciones de base de datos
 ├── lib/                    # Scripts utilitarios (seeds, migrate)
-├── spec/                   # Tests de integración completos
+├── spec/
+│   └── integration/        # Tests de integración completos (61 tests)
+│       ├── auth_spec.rb              # Tests de autenticación
+│       ├── categories_spec.rb        # Tests de categorías
+│       ├── products_spec.rb          # Tests de productos
+│       ├── menus_spec.rb            # Tests de menús
+│       ├── basic_api_spec.rb        # Tests básicos de API
+│       └── product_modifiers_spec.rb # Tests de modificadores (CRUD)
 ├── app.rb                  # Aplicación principal Sinatra
 ├── config.ru              # Configuración Rack
 ├── Dockerfile              # Containerización
@@ -332,18 +492,25 @@ Esto creará:
 - **Modelos completos**: ProductModifier y ProductModifierOption
 - **Base de datos**: Tablas con relaciones y validaciones
 - **Consultas funcionales**: Los modificadores aparecen en `/menus` y `/menus/categories/:id`
+- **CRUD completo**: Endpoints dedicados para gestión administrativa
+- **Gestión de opciones**: CRUD completo para opciones de modificadores
 - **Seeds con datos**: Ejemplos reales de hamburguesas con toppings y pizzas con tamaños
-- **Tests de integración**: Validación de estructura completa en menús
+- **Tests de integración**: Validación de estructura completa en menús y CRUD
 - **Validaciones de integridad**: No se pueden eliminar productos usados como opciones
+- **Validaciones de negocio**: Constraints de selección, productos únicos por modificador
 
-### 📝 Lo que falta (para CRUD completo):
-- Endpoints GET `/product-modifiers` 
-- Endpoints POST `/product-modifiers`
-- Endpoints PUT `/product-modifiers/:id`
-- Endpoints DELETE `/product-modifiers/:id`
-- Endpoints para gestionar opciones de modificadores
+### ✅ Endpoints CRUD de Modificadores:
+- ✅ `GET /product-modifiers` - Listar con filtros y paginación
+- ✅ `GET /product-modifiers/:id` - Obtener con opciones incluidas
+- ✅ `POST /product-modifiers` - Crear con validaciones
+- ✅ `PUT /product-modifiers/:id` - Actualizar con validaciones
+- ✅ `DELETE /product-modifiers/:id` - Eliminar en cascada
+- ✅ `GET /product-modifiers/:id/options` - Gestionar opciones
+- ✅ `POST /product-modifiers/:id/options` - Crear opciones
+- ✅ `PUT /product-modifiers/:id/options/:option_id` - Actualizar opciones
+- ✅ `DELETE /product-modifiers/:id/options/:option_id` - Eliminar opciones
 
-**El sistema de modificadores es funcional** - se puede ver en acción consultando el menú completo.
+**El sistema de modificadores está 100% completo** - tanto funcional como administrativo.
 
 ## 🔧 Comandos Útiles
 
@@ -413,13 +580,16 @@ docker-compose --env-file .env.production up app
 
 Los tests de integración cubren:
 
-- ✅ **41 tests ejecutándose** con 100% de éxito
+- ✅ **61 tests ejecutándose** con 100% de éxito
 - ✅ Autenticación (registro, login, obtener usuario actual)
 - ✅ CRUD de categorías con jerarquías
 - ✅ CRUD de productos con filtros y paginación
+- ✅ **CRUD completo de modificadores de productos**
+- ✅ **CRUD completo de opciones de modificadores**
 - ✅ **Modificadores en consultas de menú** (estructura completa)
 - ✅ Endpoint de menú completo con modificadores
 - ✅ **Validaciones de integridad** (productos con modificadores)
+- ✅ **Validaciones de negocio** (constraints, duplicados)
 - ✅ Validaciones y manejo de errores
 - ✅ Autorización y autenticación
 
@@ -428,8 +598,9 @@ Los tests de integración cubren:
 - Products API (8 tests) 
 - Categories API (6 tests)
 - Menus API (5 tests) - incluye validación de modificadores
-- Simplified API (8 tests)
-- Tests de validación de modificadores (7 tests indirectos)
+- Basic API (8 tests) - antes simplified_api_spec
+- **Product Modifiers API (20 tests)** - CRUD completo de modificadores
+- **Product Modifier Options API (7 tests)** - CRUD de opciones
 
 Ejecutar tests:
 ```bash
@@ -458,14 +629,22 @@ make test
 ## 📊 Estado del Proyecto
 
 **✅ Completamente Funcional**
-- 16 endpoints implementados y funcionando
-- 41 tests de integración (100% pasando)
-- Sistema de modificadores funcional (visible en menús)
+- 26 endpoints implementados y funcionando
+- 61 tests de integración (100% pasando)
+- Sistema de modificadores 100% completo (CRUD + consultas)
+- CRUD completo para gestión administrativa de modificadores
 - Base de datos completa con todas las relaciones
 - Autenticación JWT implementada
 - Containerización Docker lista
+- Calidad de código con RuboCop (refactorizado en módulos)
 
-**📝 Pendiente**
-- Endpoints CRUD para gestión directa de modificadores
+**🎯 Sistema Completo**
+- ✅ CRUD de usuarios y autenticación
+- ✅ CRUD de categorías con jerarquías
+- ✅ CRUD de productos con filtros
+- ✅ CRUD de modificadores de productos
+- ✅ CRUD de opciones de modificadores
+- ✅ Consultas de menú con toda la estructura
+- ✅ Validaciones de integridad y negocio
 
 **Desarrollado siguiendo las mejores prácticas de Ruby y APIs REST** 🚀
