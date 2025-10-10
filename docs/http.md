@@ -1,0 +1,1 @@
+HTTP es un protocolo sin estado que permite la comunicación entre cliente y servidor en la web. Utiliza métodos como GET, POST, PUT y DELETE para solicitar o enviar recursos como páginas HTML o datos.

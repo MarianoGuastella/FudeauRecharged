@@ -1,0 +1,3 @@
+Fudo es una startup que ofrece una plataforma integral para la gestión de negocios gastronómicos. Utiliza tecnología de vanguardia para que los restaurantes administren productos, facturación, comandas y pedidos dentro de un entorno flexible, moderno e intuitivo. También permite integraciones con sistemas de pago y mensajería.
+
+La empresa promueve una cultura centrada en la satisfacción del cliente, la transparencia y la honestidad. Posee una fuerte presencia en el mercado latinoamericano y un futuro prometedor gracias a su enfoque innovador, por el profesionalismo que manejan, la pasión y el hambre de aprender y mejorar que se que tienen, y también al crecimiento sostenido de su comunidad de usuarios.

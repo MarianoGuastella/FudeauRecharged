@@ -1,0 +1,1 @@
+TCP es un protocolo de comunicación confiable que garantiza que los datos enviados entre cliente y servidor lleguen completos y en orden. Opera sobre IP y proporciona control de flujo y detección de errores.
