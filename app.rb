@@ -15,6 +15,7 @@ require_relative 'app/models/product_modifier_option'
 # Load helpers
 require_relative 'app/helpers/error_handlers'
 require_relative 'app/helpers/authentication_helpers'
+require_relative 'app/helpers/pagination_helpers'
 
 # Load routes
 require_relative 'app/routes/auth_routes'
@@ -26,6 +27,7 @@ require_relative 'app/routes/product_modifier_routes'
 class RestaurantAPI < Sinatra::Base
   include ErrorHandlers
   include AuthenticationHelpers
+  include PaginationHelpers
   include AuthRoutes
   include ProductRoutes
   include CategoryRoutes

@@ -7,15 +7,18 @@ module ProductModifierOptionRoutes
 
   module ClassMethods
     def register_product_modifier_option_routes
-      # Product Modifier Options endpoints
       get '/product-modifiers/:modifier_id/options' do
         modifier = ProductModifier[params[:modifier_id]]
         halt 404, { error: 'Product modifier not found' }.to_json unless modifier
 
-        options = ProductModifierOption.where(product_modifier_id: modifier.id).all
+        options = ProductModifierOption
+                  .where(product_modifier_id: modifier.id)
+                  .eager(:product)
+
+        pagination = paginate_dataset(options)
 
         {
-          data: options.map do |option|
+          data: pagination[:data].all.map do |option|
             {
               id: option.id,
               product: {
@@ -28,10 +31,12 @@ module ProductModifierOptionRoutes
               default_selected: option.default_selected || false,
             }
           end,
+          pagination: pagination[:pagination],
         }.to_json
       end
 
       post '/product-modifiers/:modifier_id/options' do
+        authenticate!
         modifier = ProductModifier[params[:modifier_id]]
         halt 404, { error: 'Product modifier not found' }.to_json unless modifier
 
@@ -39,13 +44,11 @@ module ProductModifierOptionRoutes
           data = JSON.parse(request.body.read, symbolize_names: true)
 
           handle_database_errors do
-            # Validate required fields
             unless data[:product_id]
               status 422
               return { error: 'Missing required field: product_id' }.to_json
             end
 
-            # Validate product exists
             product = Product[data[:product_id]]
             unless product
               status 422
@@ -84,6 +87,7 @@ module ProductModifierOptionRoutes
       end
 
       put '/product-modifiers/:modifier_id/options/:option_id' do
+        authenticate!
         modifier = ProductModifier[params[:modifier_id]]
         halt 404, { error: 'Product modifier not found' }.to_json unless modifier
 
@@ -98,7 +102,6 @@ module ProductModifierOptionRoutes
           data = JSON.parse(request.body.read, symbolize_names: true)
 
           handle_database_errors do
-            # Validate product exists if changing product_id
             if data[:product_id] && data[:product_id] != option.product_id
               product = Product[data[:product_id]]
               unless product
@@ -106,7 +109,6 @@ module ProductModifierOptionRoutes
                 return { error: 'Product not found' }.to_json
               end
 
-              # Check if option already exists for new product
               existing_option = ProductModifierOption.where(
                 product_modifier_id: modifier.id,
                 product_id: data[:product_id],
@@ -135,13 +137,13 @@ module ProductModifierOptionRoutes
       end
 
       delete '/product-modifiers/:modifier_id/options/:option_id' do
+        authenticate!
         modifier = ProductModifier[params[:modifier_id]]
         halt 404, { error: 'Product modifier not found' }.to_json unless modifier
 
         option = ProductModifierOption[params[:option_id]]
         halt 404, { error: 'Modifier option not found' }.to_json unless option
 
-        # Verify option belongs to modifier
         unless option.product_modifier_id == modifier.id
           halt 422, { error: 'Option does not belong to this modifier' }.to_json
         end

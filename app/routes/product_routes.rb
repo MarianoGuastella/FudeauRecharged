@@ -7,7 +7,6 @@ module ProductRoutes
 
   module ClassMethods
     def register_product_routes
-      # Product endpoints
       get '/products' do
         handle_database_errors do
           products = Product.dataset
@@ -19,18 +18,17 @@ module ProductRoutes
 
           products = products.where(category_id: params[:category_id]) if params[:category_id]
 
-          page = (params[:page] || 1).to_i
-          per_page = (params[:per_page] || 2).to_i
-          offset = (page - 1) * per_page
+          pagination = paginate_dataset(products)
 
-          products = products.limit(per_page).offset(offset)
-
-          { data: products.all.map(&:to_hash) }.to_json
+          {
+            data: pagination[:data].all.map(&:to_hash),
+            pagination: pagination[:pagination],
+          }.to_json
         end
       end
 
       get '/products/:id' do
-        product = Product[params[:id]]
+        product = Product.eager(:category).where(id: params[:id]).first
         halt 404, { error: 'Product not found' }.to_json unless product
 
         response = product.to_hash
@@ -45,6 +43,7 @@ module ProductRoutes
       end
 
       post '/products' do
+        authenticate!
         handle_json_parse_error do
           data = JSON.parse(request.body.read, symbolize_names: true)
 
@@ -57,6 +56,7 @@ module ProductRoutes
       end
 
       put '/products/:id' do
+        authenticate!
         product = Product[params[:id]]
         halt 404, { error: 'Product not found' }.to_json unless product
 
@@ -71,16 +71,17 @@ module ProductRoutes
       end
 
       delete '/products/:id' do
+        authenticate!
         product = Product[params[:id]]
         halt 404, { error: 'Product not found' }.to_json unless product
 
         handle_database_errors do
-          if ProductModifier.where(product_id: product.id).any?
+          if ProductModifier.where(product_id: product.id).count > 0
             status 422
             return { error: 'Cannot delete product with associated modifiers' }.to_json
           end
 
-          if ProductModifierOption.where(product_id: product.id).any?
+          if ProductModifierOption.where(product_id: product.id).count > 0
             status 422
             return { error: 'Cannot delete product that is used as a modifier option' }.to_json
           end

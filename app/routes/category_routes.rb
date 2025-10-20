@@ -7,25 +7,12 @@ module CategoryRoutes
 
   module ClassMethods
     def register_category_routes
-      # Category endpoints
       get '/categories' do
-        page = (params[:page] || 1).to_i
-        per_page = (params[:per_page] || 2).to_i
-
-        total = Category.count
-        total_pages = (total.to_f / per_page).ceil
-
-        offset = (page - 1) * per_page
-        categories = Category.limit(per_page).offset(offset).all
+        pagination = paginate_dataset(Category)
 
         {
-          data: categories.map(&:to_hash),
-          pagination: {
-            page: page,
-            per_page: per_page,
-            total: total,
-            total_pages: total_pages,
-          },
+          data: pagination[:data].all.map(&:to_hash),
+          pagination: pagination[:pagination],
         }.to_json
       end
 
@@ -40,6 +27,7 @@ module CategoryRoutes
       end
 
       post '/categories' do
+        authenticate!
         handle_json_parse_error do
           data = JSON.parse(request.body.read, symbolize_names: true)
 
@@ -52,6 +40,7 @@ module CategoryRoutes
       end
 
       put '/categories/:id' do
+        authenticate!
         category = Category[params[:id]]
         halt 404, { error: 'Category not found' }.to_json unless category
 
@@ -66,11 +55,12 @@ module CategoryRoutes
       end
 
       delete '/categories/:id' do
+        authenticate!
         category = Category[params[:id]]
         halt 404, { error: 'Category not found' }.to_json unless category
 
         handle_database_errors do
-          if Product.where(category_id: category.id).any?
+          if Product.where(category_id: category.id).count > 0
             status 422
             return { error: 'Cannot delete category with products' }.to_json
           end

@@ -9,7 +9,20 @@ module MenuRoutes
     def register_menu_routes
       # Menu endpoints
       get '/menus' do
-        categories = Category.where(parent_id: nil).all
+        categories = Category
+                     .where(parent_id: nil)
+                     .eager(
+                       subcategories: {
+                         products: {
+                           product_modifiers: {
+                             product_modifier_options: :product,
+                           },
+                         },
+                       },
+                     )
+                     .order(:sort_order)
+                     .all
+
         menu_data = {
           menu: {
             categories: categories.map do |category|
@@ -17,14 +30,14 @@ module MenuRoutes
                 id: category.id,
                 name: category.name,
                 description: category.description,
-                subcategories: Category.where(parent_id: category.id).map do |subcategory|
+                subcategories: category.subcategories.map do |subcategory|
                   {
                     id: subcategory.id,
                     name: subcategory.name,
                     description: subcategory.description,
-                    products: Product.where(category_id: subcategory.id).map do |product|
+                    products: subcategory.products.map do |product|
                       product_hash = product.to_hash
-                      product_hash[:modifiers] = ProductModifier.where(product_id: product.id).map do |modifier|
+                      product_hash[:modifiers] = product.product_modifiers.map do |modifier|
                         {
                           id: modifier.id,
                           name: modifier.name,
@@ -32,7 +45,7 @@ module MenuRoutes
                           required: modifier.required,
                           min_selections: modifier.min_selections,
                           max_selections: modifier.max_selections,
-                          options: ProductModifierOption.where(product_modifier_id: modifier.id).map do |option|
+                          options: modifier.product_modifier_options.map do |option|
                             {
                               id: option.id,
                               product: {
@@ -62,13 +75,22 @@ module MenuRoutes
         category = Category[params[:id]]
         halt 404, { error: 'Category not found' }.to_json unless category
 
+        products = Product
+                   .where(category_id: category.id)
+                   .eager(
+                     product_modifiers: {
+                       product_modifier_options: :product,
+                     },
+                   )
+                   .all
+
         menu_data = {
           id: category.id,
           name: category.name,
           description: category.description,
-          products: Product.where(category_id: category.id).map do |product|
+          products: products.map do |product|
             product_hash = product.to_hash
-            product_hash[:modifiers] = ProductModifier.where(product_id: product.id).map do |modifier|
+            product_hash[:modifiers] = product.product_modifiers.map do |modifier|
               {
                 id: modifier.id,
                 name: modifier.name,
@@ -76,7 +98,7 @@ module MenuRoutes
                 required: modifier.required,
                 min_selections: modifier.min_selections,
                 max_selections: modifier.max_selections,
-                options: ProductModifierOption.where(product_modifier_id: modifier.id).map do |option|
+                options: modifier.product_modifier_options.map do |option|
                   {
                     id: option.id,
                     product: {

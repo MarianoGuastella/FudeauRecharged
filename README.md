@@ -6,14 +6,14 @@ Una API REST completa para gestionar el menú de un restaurante, construida con 
 
 - **CRUD completo** para productos y categorías
 - **Sistema de modificadores** funcional (incluido en consultas de menú)
-- **Autenticación JWT** con registro y login de usuarios
+- **Autenticación JWT** (JSON Web Tokens con expiración y firma segura)
 - **Categorías jerárquicas** (categorías y subcategorías)
 - **Endpoint de menú completo** con toda la estructura incluyendo modificadores
 - **Base de datos SQLite** para persistencia
-- **Tests de integración** completos (41 tests, 100% pasando)
+- **Tests de integración** completos (58 tests, 100% pasando)
 - **Calidad de código** con RuboCop configurado para Sinatra
 - **Containerización con Docker**
-- **Documentación API** incluida
+- **Documentación API** completa incluida
 
 ## 📋 Requisitos
 
@@ -21,7 +21,7 @@ Una API REST completa para gestionar el menú de un restaurante, construida con 
 - SQLite3
 - Docker (opcional)
 
-## � **Inicio Rápido**
+##  **Inicio Rápido**
 
 ### **Opción 1: Con Docker (Recomendado)**
 ```bash
@@ -54,7 +54,7 @@ make server
 # La aplicación estará en http://localhost:4567
 ```
 
-## ���️ Instalación y Configuración Detallada
+## Instalación y Configuración Detallada
 
 ### Instalación Local
 
@@ -124,7 +124,7 @@ make test
 bundle exec rspec spec/integration/auth_spec.rb
 ```
 
-## � Calidad de Código
+## Calidad de Código
 
 Este proyecto utiliza RuboCop para mantener la calidad y consistencia del código, configurado específicamente para proyectos Sinatra.
 
@@ -146,7 +146,7 @@ bundle exec rubocop --config .rubocop.yml
 - Excluye directorios de dependencias y temporales
 - Incluye reglas de seguridad básicas
 
-## �📚 API Endpoints
+## 📚 API Endpoints
 
 **Total de endpoints implementados: 26**
 
@@ -162,44 +162,50 @@ bundle exec rubocop --config .rubocop.yml
 
 | Método | Endpoint | Descripción | Autenticación |
 |--------|----------|-------------|---------------|
-| GET | `/categories` | Listar categorías (paginado) | Sí |
-| GET | `/categories/tree` | Árbol de categorías | Sí |
+| GET | `/categories` | Listar categorías (paginado) | No |
+| GET | `/categories/tree` | Árbol de categorías | No |
 | POST | `/categories` | Crear categoría | Sí |
 | PUT | `/categories/:id` | Actualizar categoría | Sí |
 | DELETE | `/categories/:id` | Eliminar categoría | Sí |
+
+#### Paginación de categorías:
+- `?page=1` - Número de página (default: 1)
+- `?per_page=20` - Resultados por página (default: 20, máximo: 100)
 
 ### Productos (5 endpoints)
 
 | Método | Endpoint | Descripción | Autenticación |
 |--------|----------|-------------|---------------|
-| GET | `/products` | Listar productos (con filtros) | Sí |
-| GET | `/products/:id` | Obtener producto específico | Sí |
+| GET | `/products` | Listar productos (con filtros y paginación) | No |
+| GET | `/products/:id` | Obtener producto específico | No |
 | POST | `/products` | Crear producto | Sí |
 | PUT | `/products/:id` | Actualizar producto | Sí |
 | DELETE | `/products/:id` | Eliminar producto | Sí |
 
-#### Filtros para productos:
+#### Filtros y paginación para productos:
 - `?category_id=123` - Filtrar por categoría
 - `?available=true` - Solo productos disponibles
-- `?page=1&per_page=20` - Paginación
+- `?page=1` - Número de página (default: 1)
+- `?per_page=20` - Resultados por página (default: 20, máximo: 100)
 
 ### Modificadores de Productos (10 endpoints)
 
 | Método | Endpoint | Descripción | Autenticación |
 |--------|----------|-------------|---------------|
-| GET | `/product-modifiers` | Listar modificadores (con filtros) | Sí |
-| GET | `/product-modifiers/:id` | Obtener modificador específico | Sí |
+| GET | `/product-modifiers` | Listar modificadores (con filtros y paginación) | No |
+| GET | `/product-modifiers/:id` | Obtener modificador específico | No |
 | POST | `/product-modifiers` | Crear modificador | Sí |
 | PUT | `/product-modifiers/:id` | Actualizar modificador | Sí |
 | DELETE | `/product-modifiers/:id` | Eliminar modificador | Sí |
-| GET | `/product-modifiers/:id/options` | Listar opciones de modificador | Sí |
+| GET | `/product-modifiers/:id/options` | Listar opciones de modificador (paginado) | No |
 | POST | `/product-modifiers/:id/options` | Crear opción de modificador | Sí |
 | PUT | `/product-modifiers/:id/options/:option_id` | Actualizar opción | Sí |
 | DELETE | `/product-modifiers/:id/options/:option_id` | Eliminar opción | Sí |
 
-#### Filtros para modificadores:
-- `?product_id=123` - Filtrar por producto
-- `?page=1&per_page=20` - Paginación
+#### Filtros y paginación para modificadores:
+- `?product_id=123` - Filtrar modificadores por producto
+- `?page=1` - Número de página (default: 1)
+- `?per_page=20` - Resultados por página (default: 20, máximo: 100)
 
 **Nota**: Los modificadores también se incluyen automáticamente en los endpoints de menú con toda su estructura.
 
@@ -207,8 +213,10 @@ bundle exec rubocop --config .rubocop.yml
 
 | Método | Endpoint | Descripción | Autenticación |
 |--------|----------|-------------|---------------|
-| GET | `/menus` | Obtener menú completo con modificadores | Sí |
-| GET | `/menus/categories/:id` | Obtener menú de categoría específica | Sí |
+| GET | `/menus` | Obtener menú completo con modificadores | No |
+| GET | `/menus/categories/:id` | Obtener menú de categoría específica | No |
+
+**Nota**: Los endpoints de menú NO usan paginación ya que retornan la estructura completa del menú para ser consumida por clientes (apps móviles, web).
 
 ### Salud del Sistema (1 endpoint)
 
@@ -216,7 +224,71 @@ bundle exec rubocop --config .rubocop.yml
 |--------|----------|-------------|---------------|
 | GET | `/health` | Estado del sistema | No |
 
-## 📝 Ejemplos de Uso
+## Autenticación
+
+El sistema utiliza autenticación con **JWT (JSON Web Tokens)**:
+
+1. **Registro o Login**: El usuario se registra (`/auth/register`) o hace login (`/auth/login`).
+2. **Recibe un token JWT**: La respuesta incluye un token JWT firmado con expiración de 24 horas.
+3. **Usa el token**: Para endpoints protegidos, envía el header: `Authorization: Bearer <jwt_token>`.
+
+**Ejemplo de respuesta de login:**
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "Usuario"
+  },
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHAiOjE3Mjk1NTUyMDAsImlhdCI6MTcyOTQ2ODgwMH0.signature"
+}
+```
+
+**Características del JWT:**
+- **Algoritmo**: HS256
+- **Expiración**: 24 horas desde la emisión
+- **Payload**: Incluye `user_id`, `email`, `exp` (expiración) e `iat` (issued at)
+- **Secreto**: Configurable mediante la variable de entorno `JWT_SECRET`
+
+**Configuración de seguridad:**
+```bash
+# En producción, asegúrate de configurar un secreto fuerte
+export JWT_SECRET="tu-clave-secreta-super-segura-de-al-menos-32-caracteres"
+```
+
+### Paginación
+
+Los endpoints de listado (GET de categorías, productos, modificadores y opciones) soportan paginación mediante parámetros de query:
+
+**Parámetros:**
+- `page`: Número de página (default: 1, mínimo: 1)
+- `per_page`: Elementos por página (default: 20, mínimo: 1, máximo: 100)
+
+**Ejemplo de uso:**
+```bash
+# Obtener la segunda página con 50 elementos
+curl "http://localhost:4567/api/products?page=2&per_page=50"
+```
+
+**Respuesta con metadatos:**
+```json
+{
+  "data": [...],
+  "pagination": {
+    "current_page": 2,
+    "per_page": 50,
+    "total_count": 150,
+    "total_pages": 3
+  }
+}
+```
+
+**Notas importantes:**
+- El endpoint `/api/menu` NO utiliza paginación, ya que devuelve la estructura completa del menú
+- Si se solicita un `per_page` mayor a 100, se limitará automáticamente a 100
+- Si se solicita un `page` mayor al total de páginas, se devolverá un arreglo vacío con los metadatos correctos
+
+## Ejemplos de Uso
 
 ### 1. Registro de Usuario
 ```bash
@@ -237,6 +309,14 @@ curl -X POST http://localhost:4567/auth/login \
     "email": "user@example.com",
     "password": "password123"
   }'
+```
+
+**Respuesta:**
+```json
+{
+  "user": { "id": 1, "email": "user@example.com", "name": "Usuario" },
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJleHAiOjE3Mjk1NTUyMDAsImlhdCI6MTcyOTQ2ODgwMH0.signature"
+}
 ```
 
 ### 3. Crear Categoría
@@ -549,8 +629,20 @@ Crear un archivo `.env.production`:
 
 ```env
 RACK_ENV=production
-JWT_SECRET=your-super-secure-production-secret
 PORT=4567
+JWT_SECRET=tu-clave-secreta-super-segura-de-al-menos-32-caracteres-generada-aleatoriamente
+ADMIN_EMAIL=admin@restaurant.com
+ADMIN_PASSWORD=secure_password_here
+DATABASE_URL=sqlite://db/production.sqlite3
+```
+
+**Importante**: Genera una clave JWT_SECRET segura usando:
+```bash
+# Opción 1: OpenSSL
+openssl rand -hex 32
+
+# Opción 2: Ruby
+ruby -e "require 'securerandom'; puts SecureRandom.hex(32)"
 ```
 
 ### Comandos Docker
@@ -571,17 +663,21 @@ docker-compose --env-file .env.production up app
 
 ## 🔒 Seguridad
 
-- **Autenticación JWT**: Todos los endpoints (excepto registro, login y health) requieren autenticación
-- **Validación de datos**: Validaciones en modelos y controladores
-- **Hashing de contraseñas**: Usando BCrypt
-- **Variables de entorno**: Secretos manejados via environment variables
+- **Autenticación JWT**: Todos los endpoints (excepto registro, login y health) requieren autenticación mediante JWT en header `Authorization: Bearer <jwt_token>`
+- **JSON Web Tokens (JWT)**: Tokens firmados con HS256, expiración de 24 horas, payload con user_id y email
+- **Secreto JWT configurable**: Variable de entorno `JWT_SECRET` para firma de tokens
+- **Validación de datos**: Validaciones en modelos usando Sequel validation_helpers plugin
+- **Hashing de contraseñas**: Usando BCrypt con salt automático
+- **Variables de entorno**: Secretos y configuración manejados via environment variables
+- **Expiración automática**: Los tokens JWT expiran después de 24 horas
+- **Protección CSRF**: Los JWT no son vulnerables a CSRF cuando se usan correctamente
 
 ## ✅ Tests
 
 Los tests de integración cubren:
 
-- ✅ **61 tests ejecutándose** con 100% de éxito
-- ✅ Autenticación (registro, login, obtener usuario actual)
+- ✅ **58 tests ejecutándose** con 100% de éxito
+- ✅ Autenticación JWT (registro, login, tokens, expiración)
 - ✅ CRUD de categorías con jerarquías
 - ✅ CRUD de productos con filtros y paginación
 - ✅ **CRUD completo de modificadores de productos**
@@ -591,15 +687,15 @@ Los tests de integración cubren:
 - ✅ **Validaciones de integridad** (productos con modificadores)
 - ✅ **Validaciones de negocio** (constraints, duplicados)
 - ✅ Validaciones y manejo de errores
-- ✅ Autorización y autenticación
+- ✅ Autorización y autenticación JWT
 
 **Categorías de tests**:
-- Auth API (7 tests)
+- Auth API (8 tests) - incluyendo validación JWT
 - Products API (8 tests) 
 - Categories API (6 tests)
 - Menus API (5 tests) - incluye validación de modificadores
-- Basic API (8 tests) - antes simplified_api_spec
-- **Product Modifiers API (20 tests)** - CRUD completo de modificadores
+- Basic API (8 tests)
+- **Product Modifiers API (16 tests)** - CRUD completo de modificadores
 - **Product Modifier Options API (7 tests)** - CRUD de opciones
 
 Ejecutar tests:
@@ -630,11 +726,11 @@ make test
 
 **✅ Completamente Funcional**
 - 26 endpoints implementados y funcionando
-- 61 tests de integración (100% pasando)
+- 58 tests de integración (100% pasando)
 - Sistema de modificadores 100% completo (CRUD + consultas)
 - CRUD completo para gestión administrativa de modificadores
 - Base de datos completa con todas las relaciones
-- Autenticación JWT implementada
+- Autenticación JWT con firma HS256 y expiración de 24 horas
 - Containerización Docker lista
 - Calidad de código con RuboCop (refactorizado en módulos)
 

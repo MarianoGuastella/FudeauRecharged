@@ -81,13 +81,16 @@ RSpec.describe 'Basic API Tests' do
 
     describe 'POST /categories' do
       it 'creates a new category' do
+        user = create_user
+        token = login_user(user)
+
         category_data = {
           name: 'Test Category',
           description: 'A test category',
           sort_order: 1,
         }
 
-        post '/categories', category_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
+        post '/categories', category_data.to_json, { 'CONTENT_TYPE' => 'application/json' }.merge(auth_headers(token))
 
         expect(last_response.status).to eq(201)
         response = json_response
@@ -114,6 +117,9 @@ RSpec.describe 'Basic API Tests' do
 
     describe 'POST /products' do
       it 'creates a new product' do
+        user = create_user
+        token = login_user(user)
+
         product_data = {
           name: 'Test Product',
           description: 'A test product',
@@ -121,7 +127,7 @@ RSpec.describe 'Basic API Tests' do
           category_id: @category.id,
         }
 
-        post '/products', product_data.to_json, { 'CONTENT_TYPE' => 'application/json' }
+        post '/products', product_data.to_json, { 'CONTENT_TYPE' => 'application/json' }.merge(auth_headers(token))
 
         expect(last_response.status).to eq(201)
         response = json_response

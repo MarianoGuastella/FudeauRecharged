@@ -25,9 +25,6 @@ gem 'puma', '~> 6.3'
 # Environment variables
 gem 'dotenv', '~> 2.8'
 
-# Validations
-gem 'dry-validation', '~> 1.10'
-
 group :development, :test do
   gem 'factory_bot', '~> 6.2'
   gem 'faker', '~> 3.2'
